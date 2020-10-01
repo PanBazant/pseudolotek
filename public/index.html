@@ -1,17 +1,225 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-  </head>
-  <body>
-    <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-  </body>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Pseudolotek</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.0/spectre.min.css">
+    <style>
+        body{
+        }
+        .t{
+            margin: 10px 0px;
+        }
+        .avatar{
+            margin: 5px;
+        }
+        .main{
+            margin-top: 10%;
+        }
+        .f{
+            background-color: whitesmoke;
+        }
+        [v-cloak]{
+            display: none;
+        }
+    </style> 
+</head>
+<body>
+    
+
+    <div class="container grid-lg text-center" >
+
+        <div id="app" class="main" v-cloak :class="{'f': clicked}">
+          
+            <!-- <p :style="{'color': arrayTable[0][1].color}" v-text="arrayTable[0][0]"></p>
+            <p :style="{'color': arrayTable[1][1].color}" v-text="arrayTable[1][0]"></p>
+            <p :style="{'color': arrayTable[2][1].color}" v-text="arrayTable[2][0]"></p>
+            <p :style="{'color': arrayTable[3][1].color}" v-text="arrayTable[3][0]"></p>
+            <p :style="{'color': arrayTable[4][1].color}" v-text="arrayTable[4][0]"></p>
+            <br>
+            <p>
+                <span :style="{'color': arrayTable[0][1].color}" v-text="arrayTable[0][0]"></span>
+                <span :style="{'color': arrayTable[1][1].color}" v-text="arrayTable[1][0]"></span>
+                <span :style="{'color': arrayTable[2][1].color}" v-text="arrayTable[2][0]"></span>
+                <span :style="{'color': arrayTable[3][1].color}" v-text="arrayTable[3][0]"></span>
+                <span :style="{'color': arrayTable[4][1].color}" v-text="arrayTable[4][0]"></span>
+            </p>             -->
+            <button class="btn btn-lg btn-primary" v-on:click="chooseNumber(); draw(); validation(); clicked=true" style="margin-bottom: 3%; margin-top: 3%;">Start</button>
+            <!-- <p v-text="choosenNumber"></p> -->
+            <div class="toast" :class="{'t' : clicked}" v-show="clicked">Podane liczby</div>
+            <div v-for="number of choosenNumber" class="avatar avatar-xl" style="text-align: center; padding-top: 10px;">{{number}}</div>
+            <!-- <p v-text="score"></p> -->
+            <div class="toast" :class="{'t' : clicked}" v-show="clicked">Wylosowane liczby</div>
+            <div class="container grid-lg"  v-for="x of arrayTable">
+                <div class="avatar avatar-xl" :style="{'background-color': x[1].color}" v-for="i of x[0]"><p style="text-align: center; padding-top: 10px;">{{i}}</p></div>
+            </div>
+            <div class="toast" :class="{'t' : clicked}" v-show="clicked">Trafione liczby: {{score}}</div>
+            <div v-for="h in hits.length"  class="avatar avatar-xl" :style="{'background-color': hitsColor[h-1].color}"><p style="text-align: center; padding-top: 10px;">{{hits[h-1]}}</p></div>
+            <!-- <p>hits: {{hits}}</p> -->
+            <!-- <p>hitsColor: {{hitsColor}}</p> -->
+            
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.js"></script>
+    <script>
+
+        new Vue({
+            el: "#app",
+            data: {
+                arrayTable :[
+                    [[], {"color": "red"}],
+                    [[], {"color": "blue"}],
+                    [[], {"color": "purple"}],
+                    [[], {"color": "gray"}],
+                    [[], {"color": "orange"}],
+                ],
+                money: 100,
+                bet: 2,
+                score: 0,
+                choosenNumber: [],
+                drawNumber: [],
+                hits: [],
+                hitsColor: [],
+                clicked: false,
+                x: [],
+                prettifyArray: [[],[]]
+            },
+            computed: {
+            
+        
+            },
+            methods: {
+               arrayFill: function(a, range){
+                   for(i = 0; i < range; i++){
+                    a[i] = i + 1;
+                   }
+                   return a;
+               },
+
+               arrayRandomFill: function(a, length, range){
+                    for(i = 0; i < length; i++){
+                        let x = Math.round(Math.random() * range) + 1;
+                        if(a.includes(x)){
+                            i--;
+                            continue;
+                        }
+                        a[a.length] = x;
+                    }
+                    return a;
+               },
+               chooseNumber: function(){
+                   this.choosenNumber = [];
+                    for(i=0; i < 6; i++){
+                        let x = parseInt(prompt("Podaj " + (i+1) + " liczbę"));
+                        if(this.choosenNumber.includes(x) || x > 50){
+                            i--;
+                            continue;
+                        }
+                        this.choosenNumber[i] = x;
+                    }
+                    return this.choosenNumber;
+               },
+               draw: function(){
+                    this.clearArray();
+                   color = this.chooseColor();
+                   for(i of color){
+                        switch(i){
+                            case 0: this.arrayRandomFill(this.arrayTable[0][0],1, 50);
+                                break;
+                            case 1: this.arrayRandomFill(this.arrayTable[1][0],1, 50);
+                                break;
+                            case 2: this.arrayRandomFill(this.arrayTable[2][0],1, 50);
+                                break;
+                            case 3: this.arrayRandomFill(this.arrayTable[3][0],1, 50);
+                                break;
+                            case 4: this.arrayRandomFill(this.arrayTable[4][0],1, 50);
+                                break;
+                        }
+                    }
+                //    for(i = 0; i < 5; i++){
+                //        console.log(this.arrayTable[i][0]);
+                //    }
+                  
+               },
+               chooseColor: function(){
+                   for(i = 0; i < 10; i++){
+                    this.x[i] = (Math.round(Math.random() * 4));
+                   }
+                   return this.x;
+               },
+                displayArray: function(){
+                    for(i = 0; i < this.arrayTable.length; i++){
+                        this.prettifyArray[0][i] = this.arrayTable[i][0];
+                        this.prettifyArray[1][i] = this.arrayTable[i][1];
+                    }
+                    return this.prettifyArray;
+                },
+                clearArray: function(){
+                    this.arrayTable = [
+                    [[], {"color": "red"}],
+                    [[], {"color": "blue"}],
+                    [[], {"color": "purple"}],
+                    [[], {"color": "gray"}],
+                    [[], {"color": "orange"}]
+                ];
+                    },
+                validation: function(){
+                    this.hits = [];
+                    this.hitsColor = [];
+                    this.score = [];
+                    for(i = 0; i < this.choosenNumber.length; i++){
+                        for(j of this.arrayTable){
+                            if(j[0].includes(this.choosenNumber[i])){
+                                this.score++;
+                                this.hits[this.hits.length] = this.choosenNumber[i];
+                                this.hitsColor[this.hitsColor.length] = j[1];
+                            }
+                        }
+                    }
+                }
+                }
+               
+                 
+            
+
+        });
+
+    </script>
+
+
+
+
+
+
+
+
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </html>
